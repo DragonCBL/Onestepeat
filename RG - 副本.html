@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>RG August · 英国中餐馆</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #0b0a08;
+            color: #e0d6c0;
+            font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+            scroll-behavior: smooth;
+        }
+        .gold-text { color: #d4af37; }
+        .bg-gold { background-color: #d4af37; }
+        .bg-dark { background-color: #0b0a08; }
+        .btn-gold {
+            background: transparent;
+            border: 1.5px solid #d4af37;
+            color: #d4af37;
+            padding: 10px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 0;
+        }
+        .btn-gold:hover {
+            background: #d4af37;
+            color: #0b0a08;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+        .btn-gold-filled {
+            background: #d4af37;
+            border: 1.5px solid #d4af37;
+            color: #0b0a08;
+            padding: 10px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 0;
+        }
+        .btn-gold-filled:hover {
+            background: transparent;
+            color: #d4af37;
+        }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
+
+        /* 导航 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 30px;
+            background: rgba(11, 10, 8, 0.92);
+            border-bottom: 1px solid #2a251c;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            backdrop-filter: blur(6px);
+            flex-wrap: wrap;
+        }
+        .logo { font-size: 1.8rem; font-weight: 700; letter-spacing: 2px; }
+        .logo span { color: #d4af37; }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            font-size: 1.1rem;
+            padding: 6px 6px;
+            border-bottom: 1px solid transparent;
+            transition: 0.2s;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+        .nav-links a:hover { border-bottom-color: #d4af37; color: #d4af37; }
+        .nav-links .btn-gold { padding: 6px 20px; font-size: 1rem; }
+        .lang-toggle {
+            background: transparent;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .lang-toggle:hover { background: #d4af37; color: #0b0a08; }
+        .hamburger { display: none; font-size: 1.8rem; color: #d4af37; cursor: pointer; }
+
+        /* 弹窗 */
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .popup-overlay.active { visibility: visible; opacity: 1; }
+        .popup-card {
+            background: #1a1712;
+            max-width: 680px;
+            width: 90%;
+            padding: 30px 25px;
+            border: 1px solid #d4af37;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            position: relative;
+            background-image: url('https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=600');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            border-radius: 0;
+        }
+        .popup-card::after {
+            content: '';
+            position: absolute;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(10, 8, 6, 0.75);
+            z-index: 1;
+            border-radius: 0;
+        }
+        .popup-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        .popup-content h2 { font-size: 2.2rem; letter-spacing: 2px; color: #d4af37; }
+        .popup-content p { font-size: 1.2rem; line-height: 1.6; margin: 12px 0; }
+        .popup-close {
+            position: absolute;
+            top: 10px; right: 18px;
+            font-size: 2rem;
+            color: #d4af37;
+            cursor: pointer;
+            z-index: 5;
+            background: none;
+            border: none;
+        }
+        .popup-offer { background: rgba(212, 175, 55, 0.15); padding: 10px; border-left: 4px solid #d4af37; }
+
+        /* 首页大图 */
+        .hero {
+            height: 92vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            padding: 20px;
+        }
+        .hero h1 { font-size: 5rem; font-weight: 700; letter-spacing: 6px; text-shadow: 0 4px 30px rgba(0,0,0,0.6); }
+        .hero h1 span { color: #d4af37; }
+        .hero p { font-size: 1.4rem; letter-spacing: 4px; margin: 16px 0 30px; }
+
+        /* 通用section */
+        section { padding: 70px 0; border-bottom: 1px solid #2a251c; }
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #d4af37;
+            text-align: center;
+        }
+        .section-sub { text-align: center; max-width: 700px; margin: 0 auto 45px; font-size: 1.2rem; color: #b8aa8c; }
+
+        /* 介绍 */
+        .about-grid {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .about-grid img { width: 100%; max-width: 540px; border: 1px solid #3a3228; }
+        .about-text { flex: 1 1 300px; }
+        .about-text p { font-size: 1.2rem; line-height: 1.7; margin-bottom: 16px; }
+
+        /* 菜单图片 */
+        .menu-images {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+        .menu-images img {
+            max-width: 100%;
+            width: 100%;
+            max-width: 560px;
+            border: 1px solid #4a4032;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            transition: 0.3s;
+        }
+        .menu-images img:hover { transform: scale(1.01); border-color: #d4af37; }
+
+        /* 招牌菜 */
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+        .featured-card {
+            background: #1a1712;
+            border: 1px solid #2f2a20;
+            text-align: center;
+            padding: 10px 10px 20px;
+        }
+        .featured-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-bottom: 2px solid #d4af37; }
+        .featured-card h4 { margin: 12px 0 4px; font-size: 1.3rem; }
+        .featured-card .price { color: #d4af37; font-size: 1.2rem; }
+
+        /* 视频 */
+        .video-wrapper {
+            max-width: 800px; margin: 0 auto; 
+            border: 2px solid #d4af37;
+            aspect-ratio: 16/9;
+        }
+        .video-wrapper iframe { width: 100%; height: 100%; border: none; }
+
+        /* 联系我们 + 地图 */
+        .contact-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .contact-info { flex: 1 1 280px; }
+        .contact-info i { color: #d4af37; width: 28px; }
+        .contact-info p { margin: 12px 0; font-size: 1.2rem; }
+        .map-wrapper {
+            flex: 1 1 380px;
+            min-height: 280px;
+            border: 1px solid #3a3228;
+        }
+        .map-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 280px;
+            border: none;
+            display: block;
+        }
+
+        /* footer */
+        footer { text-align: center; padding: 30px 20px; color: #6a5f4c; border-top: 1px solid #2a251c; }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 16px; }
+            .nav-links { display: none; width: 100%; flex-direction: column; gap: 12px; margin-top: 12px; }
+            .nav-links.open { display: flex; }
+            .hamburger { display: block; }
+            .hero h1 { font-size: 3.2rem; }
+            .section-title { font-size: 2.2rem; }
+            .about-grid { flex-direction: column; }
+            .menu-images img { max-width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 2.4rem; }
+            .popup-card { padding: 20px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 弹窗 -->
+    <div class="popup-overlay active" id="popup">
+        <div class="popup-card">
+            <button class="popup-close" id="popupClose"><i class="fas fa-times"></i></button>
+            <div class="popup-content">
+                <h2>RG August</h2>
+                <p><i class="fas fa-clock gold-text"></i> <span data-en="Mon–Sun 16:00 – 23:00" data-zh="周一至周日 16:00 – 23:00">周一至周日 16:00 – 23:00</span></p>
+                <div class="popup-offer">
+                    <p data-en="FREE Prawn Crackers for orders over £18" data-zh="订单满£18 赠虾片">订单满£18 赠虾片</p>
+                    <p data-en="FREE Prawn Crackers & Mini Veg Spring Rolls for orders over £30" data-zh="订单满£30 赠虾片+迷你蔬菜春卷">订单满£30 赠虾片+迷你蔬菜春卷</p>
+                    <p data-en="FREE Prawn Crackers for orders over £45 (excl. delivery)" data-zh="订单满£45 赠虾片 (不含配送费)">订单满£45 赠虾片 (不含配送费)</p>
+                    <p data-en="Salt & Pepper Chicken Wings" data-zh="椒盐鸡翅">椒盐鸡翅</p>
+                </div>
+                <p style="margin-top:12px; font-size:0.9rem; color:#d4af37;"><i class="fas fa-utensils"></i> 欢迎光临</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导航 -->
+    <nav class="navbar">
+        <div class="logo">RG <span>August</span></div>
+        <div class="hamburger" id="hamburger"><i class="fas fa-bars"></i></div>
+        <div class="nav-links" id="navLinks">
+            <a href="#hero" data-en="Home" data-zh="首页">首页</a>
+            <a href="#about" data-en="About" data-zh="餐厅介绍">餐厅介绍</a>
+            <a href="#menu-section" data-en="Menu" data-zh="菜单">菜单</a>
+            <a href="#featured" data-en="Specialties" data-zh="招牌菜">招牌菜</a>
+            <a href="#video" data-en="Video" data-zh="视频">视频</a>
+            <a href="#contact" data-en="Contact" data-zh="联系我们">联系我们</a>
+            <!-- 点餐按钮：跳转 www.rgaugust.co.uk -->
+            <a href="https://www.1858.merchant.onestepeat.co.uk" target="_blank" class="btn-gold" data-en="Order" data-zh="点餐">点餐</a>
+            <button class="lang-toggle" id="langToggle">EN</button>
+        </div>
+    </nav>
+
+    <!-- 首页大图 -->
+    <section class="hero" id="hero">
+        <h1>RG <span>August</span></h1>
+        <p data-en="Edinburgh · Chinese Cuisine" data-zh="爱丁堡 · 中餐臻味">爱丁堡 · 中餐臻味</p>
+        <a href="https://www.1858.merchant.onestepeat.co.uk" target="_blank" class="btn-gold-filled" id="heroOrder" data-en="Order Now" data-zh="立即点餐">立即点餐</a>
+    </section>
+
+    <!-- 餐厅介绍 -->
+    <section id="about" class="container">
+        <div class="section-title" data-en="Our Story" data-zh="餐厅故事">餐厅故事</div>
+        <div class="about-grid">
+            <img src="https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=600" alt="RG August 餐厅" style="max-width:100%;">
+            <div class="about-text">
+                <p data-en="RG August brings the authentic taste of Cantonese and Szechuan cuisine to the heart of Edinburgh. Since 2018, we have been dedicated to using fresh ingredients and time-honored recipes to create a dining experience that feels like home." data-zh="RG August 将地道的粤菜与川菜风味带到爱丁堡市中心。自2018年以来，我们坚持使用新鲜食材与古老配方，为您带来宾至如归的用餐体验。">RG August 将地道的粤菜与川菜风味带到爱丁堡市中心。自2018年以来，我们坚持使用新鲜食材与古老配方，为您带来宾至如归的用餐体验。</p>
+                <p data-en="Our signature dishes blend tradition with innovation, and every plate is crafted with passion." data-zh="招牌菜融合传统与创新，每一道菜都倾注热情。">招牌菜融合传统与创新，每一道菜都倾注热情。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 菜单模块：显示两张图片 (本地路径) -->
+    <section id="menu-section" class="container">
+        <div class="section-title" data-en="Menu" data-zh="菜单">菜单</div>
+        <div class="menu-images">
+            <!-- 请确保图片路径正确，此处使用 file:/// 协议展示本地图片 -->
+            <img src="file:///X:/Desk/1.jpg" alt="菜单1" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22560%22 height=%22700%22 viewBox=%220 0 560 700%22%3E%3Crect fill=%22%231a1712%22 width=%22560%22 height=%22700%22/%3E%3Ctext x=%22280%22 y=%22350%22 fill=%22%23d4af37%22 font-size=%2236%22 font-family=%22serif%22 text-anchor=%22middle%22%3E菜单 1%3C/text%3E%3C/svg%3E';">
+            <img src="file:///X:/Desk/2.jpg" alt="菜单2" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22560%22 height=%22700%22 viewBox=%220 0 560 700%22%3E%3Crect fill=%22%231a1712%22 width=%22560%22 height=%22700%22/%3E%3Ctext x=%22280%22 y=%22350%22 fill=%22%23d4af37%22 font-size=%2236%22 font-family=%22serif%22 text-anchor=%22middle%22%3E菜单 2%3C/text%3E%3C/svg%3E';">
+        </div>
+    </section>
+
+    <!-- 招牌菜 -->
+    <section id="featured" class="container">
+        <div class="section-title" data-en="Signature Dishes" data-zh="招牌菜">招牌菜</div>
+        <div class="featured-grid" id="featuredGrid">
+            <!-- 由JS动态生成 -->
+        </div>
+    </section>
+
+    <!-- 视频 -->
+    <section id="video" class="container">
+        <div class="section-title" data-en="Video" data-zh="视频宣传">视频宣传</div>
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/8yLz5iRqPzA?si=0mJj42fKlxYqMNE6" title="RG August 宣传视频" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- 联系我们 + 地图 -->
+    <section id="contact" class="container">
+        <div class="section-title" data-en="Contact Us" data-zh="联系我们">联系我们</div>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <p><i class="fas fa-map-pin"></i> <span data-en="14 CALDER PARK, EDINBURGH, EH11 4JN" data-zh="14 CALDER PARK, 爱丁堡, EH11 4JN">14 CALDER PARK, 爱丁堡, EH11 4JN</span> <a href="https://www.google.com/maps?q=14+CALDER+PARK+EDINBURGH+EH11+4JN" target="_blank" class="map-link" style="color:#d4af37; text-decoration:underline;"> <i class="fas fa-directions"></i> </a></p>
+                <p><i class="fas fa-phone-alt"></i> 0131 2487211 / 07858757528</p>
+                <p><i class="fas fa-envelope"></i> info@rgaugust.co.uk</p>
+                <p><i class="fas fa-clock"></i> <span data-en="Mon–Sun 16:00 – 23:00" data-zh="周一至周日 16:00 – 23:00">周一至周日 16:00 – 23:00</span></p>
+            </div>
+            <div class="map-wrapper">
+                <!-- Google 地图嵌入式 iframe -->
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2234.169841637611!2d-3.269418684396178!3d55.92128638059459!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4887b8a25e6a6b2b%3A0x5c1f0b2c7f8e6c6d!2s14%20Calder%20Park%2C%20Edinburgh%20EH11%204JN%2C%20UK!5e0!3m2!1sen!2suk!4v1650000000000" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 RG August · <span data-en="All rights reserved" data-zh="保留所有权利">保留所有权利</span></p>
+    </footer>
+
+    <script>
+        (function() {
+            // ---------- 招牌菜数据 ----------
+            const featuredDishes = [
+                { name: "Kung Pao Chicken", nameZh: "宫保鸡丁", price: "£11.90", img: "https://images.pexels.com/photos/106343/pexels-photo-106343.jpeg?auto=compress&cs=tinysrgb&w=400" },
+                { name: "Sweet & Sour Pork", nameZh: "糖醋里脊", price: "£12.50", img: "https://images.pexels.com/photos/1624487/pexels-photo-1624487.jpeg?auto=compress&cs=tinysrgb&w=400" },
+                { name: "Beef with Broccoli", nameZh: "西兰花牛肉", price: "£12.90", img: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=400" },
+                { name: "Mapo Tofu", nameZh: "麻婆豆腐", price: "£10.80", img: "https://images.pexels.com/photos/2034397/pexels-photo-2034397.jpeg?auto=compress&cs=tinysrgb&w=400" },
+                { name: "Chow Mein", nameZh: "炒面", price: "£8.90", img: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400" },
+                { name: "Prawn Crackers", nameZh: "虾片", price: "£3.50", img: "https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=400" }
+            ];
+
+            const featuredGrid = document.getElementById('featuredGrid');
+            const langToggle = document.getElementById('langToggle');
+            const popup = document.getElementById('popup');
+            const popupClose = document.getElementById('popupClose');
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+
+            let currentLang = 'zh';
+
+            // 渲染招牌菜
+            function renderFeatured() {
+                featuredGrid.innerHTML = featuredDishes.map(d => `
+                    <div class="featured-card">
+                        <img src="${d.img}" alt="${currentLang === 'zh' ? d.nameZh : d.name}" loading="lazy">
+                        <h4>${currentLang === 'zh' ? d.nameZh : d.name}</h4>
+                        <div class="price">${d.price}</div>
+                    </div>
+                `).join('');
+            }
+
+            // 语言切换
+            function setLanguage(lang) {
+                currentLang = lang;
+                document.querySelectorAll('[data-en][data-zh]').forEach(el => {
+                    el.innerText = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
+                });
+                // 导航特殊文字 (包括点餐按钮)
+                document.querySelectorAll('.nav-links a, .nav-links button, #heroOrder').forEach(el => {
+                    if (el.dataset.en && el.dataset.zh) {
+                        el.innerText = lang === 'zh' ? el.dataset.zh : el.dataset.en;
+                    }
+                });
+                renderFeatured();
+                langToggle.innerText = lang === 'zh' ? 'EN' : '中文';
+            }
+
+            langToggle.addEventListener('click', function() {
+                const nextLang = currentLang === 'zh' ? 'en' : 'zh';
+                setLanguage(nextLang);
+            });
+
+            // 弹窗关闭
+            popupClose.addEventListener('click', function() { popup.classList.remove('active'); });
+            popup.addEventListener('click', function(e) { if (e.target === popup) popup.classList.remove('active'); });
+
+            // 汉堡菜单
+            hamburger.addEventListener('click', function() {
+                navLinks.classList.toggle('open');
+            });
+
+            // 初始化
+            renderFeatured();
+            setLanguage('zh');
+
+            // 导航栏平滑滚动 (点击锚点)
+            document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    const targetEl = document.querySelector(targetId);
+                    if (targetEl) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                    // 关闭移动端菜单
+                    navLinks.classList.remove('open');
+                });
+            });
+
+        })();
+    </script>
+</body>
+</html>

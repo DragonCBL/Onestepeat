@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RG August | Edinburgh Chinese Takeaway</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --black: #0a0a0a;
+            --dark-gray: #1a1a1a;
+            --gold: #d4af37;
+            --gold-light: #f0d78c;
+            --white: #ffffff;
+            --text-gray: #cccccc;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+        /* Popup Modal 修复手机适配 */
+        .popup-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.4s;
+            padding:16px;
+        }
+        .popup-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .popup-inner {
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y:auto;
+            background: var(--dark-gray);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            position: relative;
+        }
+        .popup-bg-img {
+            width: 100%;
+            height: 180px;
+            background: url('https://images.pexels.com/photos/2313682/pexels-photo-2313682.jpeg?auto=compress&cs=tinysrgb&w=800') center/cover no-repeat;
+        }
+        .popup-close {
+            position: absolute;
+            top:12px;
+            right:12px;
+            width:36px;
+            height:36px;
+            border-radius:50%;
+            background:var(--gold);
+            color:#000;
+            border:none;
+            font-size:20px;
+            cursor:pointer;
+            z-index:2;
+        }
+        .popup-content {
+            padding:20px;
+        }
+        .popup-content h3 {
+            color:var(--gold);
+            margin-bottom:16px;
+            font-size:20px;
+        }
+        .popup-content p {
+            color:var(--text-gray);
+            margin:8px 0;
+            line-height:1.6;
+        }
+        .popup-offer-item {
+            padding:10px 0;
+            border-bottom:1px solid #333;
+            color:var(--gold-light);
+        }
+        /* Header Nav 修复Booking按钮对齐 */
+        header {
+            position:fixed;
+            width:100%;
+            top:0;
+            z-index:998;
+            background:rgba(10,10,10,0.92);
+            border-bottom:1px solid #222;
+        }
+        .nav-container {
+            max-width:1400px;
+            margin:0 auto;
+            padding:0 20px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            height:72px;
+        }
+        .logo {
+            font-size:24px;
+            font-weight:bold;
+            color:var(--gold);
+        }
+        nav {
+            display:flex;
+            align-items:center;
+        }
+        nav ul {
+            display:flex;
+            gap:26px;
+            list-style:none;
+            align-items:center;
+        }
+        nav a {
+            color:var(--text-gray);
+            text-decoration:none;
+            transition:0.3s;
+            display:block;
+        }
+        nav a:hover {
+            color:var(--gold);
+        }
+        .btn-book {
+            background:var(--gold);
+            color:#000 !important;
+            padding:8px 18px;
+            border-radius:6px;
+            font-weight:bold;
+        }
+        .lang-switch {
+            background:#222;
+            color:var(--gold);
+            border:1px solid var(--gold);
+            padding:6px 12px;
+            border-radius:4px;
+            cursor:pointer;
+            margin-left:16px;
+        }
+        .mobile-menu-btn {
+            display:none;
+            color:var(--gold);
+            font-size:24px;
+            background:none;
+            border:none;
+        }
+        /* Hero Section */
+        .hero {
+            height:100vh;
+            background:url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            position:relative;
+        }
+        .hero::before {
+            content:"";
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,0.65);
+        }
+        .hero-content {
+            position:relative;
+            text-align:center;
+            z-index:2;
+        }
+        .hero-content h1 {
+            font-size:56px;
+            color:var(--gold);
+            margin-bottom:20px;
+        }
+        .hero-content p {
+            font-size:20px;
+            color:var(--text-gray);
+            margin-bottom:32px;
+        }
+        .btn-order {
+            display:inline-block;
+            background:var(--gold);
+            color:#000;
+            font-weight:bold;
+            padding:14px 36px;
+            border-radius:8px;
+            text-decoration:none;
+            font-size:18px;
+            transition:0.3s;
+        }
+        .btn-order:hover {
+            background:var(--gold-light);
+        }
+        section {
+            padding:80px 20px;
+            max-width:1400px;
+            margin:0 auto;
+        }
+        .section-title {
+            text-align:center;
+            font-size:36px;
+            color:var(--gold);
+            margin-bottom:48px;
+        }
+        /* About Restaurant */
+        .about-wrap {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:40px;
+            align-items:center;
+        }
+        .about-img img {
+            width:100%;
+            border-radius:10px;
+            border:2px solid var(--gold);
+        }
+        .about-text p {
+            color:var(--text-gray);
+            line-height:1.8;
+            margin-bottom:16px;
+        }
+        /* Menu Section */
+        .menu-category-tabs {
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            justify-content:center;
+            margin-bottom:40px;
+        }
+        .tab-btn {
+            background:#222;
+            color:var(--text-gray);
+            border:1px solid #444;
+            padding:10px 16px;
+            border-radius:6px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+        .tab-btn.active {
+            background:var(--gold);
+            color:#000;
+            border-color:var(--gold);
+        }
+        .menu-items-container {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(280px,1fr));
+            gap:20px;
+        }
+        .menu-item-card {
+            background:var(--dark-gray);
+            border:1px solid #333;
+            padding:18px;
+            border-radius:8px;
+        }
+        .menu-item-name {
+            color:var(--gold-light);
+            font-size:17px;
+            margin-bottom:6px;
+        }
+        .menu-price {
+            margin-top:8px;
+            color:var(--gold);
+            font-weight:bold;
+        }
+        .menu-group {
+            display:none;
+        }
+        .menu-group.show {
+            display:grid;
+        }
+        /* Signature Dishes */
+        .signature-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+            gap:24px;
+        }
+        .sig-card {
+            background:var(--dark-gray);
+            border-radius:10px;
+            overflow:hidden;
+            border:1px solid #333;
+        }
+        .sig-img {
+            height:200px;
+            width:100%;
+            object-fit:cover;
+        }
+        .sig-info {
+            padding:16px;
+            text-align:center;
+        }
+        .sig-name {
+            color:var(--gold-light);
+            font-size:18px;
+            margin-bottom:6px;
+        }
+        .sig-price {
+            color:var(--gold);
+            font-weight:bold;
+        }
+        /* Video Section */
+        .video-wrap {
+            max-width:900px;
+            margin:0 auto;
+        }
+        .video-wrap iframe {
+            width:100%;
+            height:480px;
+            border:2px solid var(--gold);
+            border-radius:10px;
+        }
+        /* Contact Section */
+        .contact-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:40px;
+        }
+        .contact-block h4 {
+            color:var(--gold);
+            margin-bottom:14px;
+            font-size:20px;
+        }
+        .contact-block p, .contact-block a {
+            color:var(--text-gray);
+            line-height:1.8;
+            text-decoration:none;
+        }
+        .contact-block a:hover {
+            color:var(--gold);
+        }
+        .map-embed {
+            width:100%;
+            height:320px;
+            border:2px solid var(--gold);
+            border-radius:10px;
+        }
+        footer {
+            background:#111;
+            padding:30px 20px;
+            text-align:center;
+            border-top:1px solid #222;
+            color:#888;
+        }
+        /* Mobile */
+        @media(max-width:900px) {
+            nav ul {
+                position:absolute;
+                top:72px;
+                left:0;
+                width:100%;
+                background:#0a0a0a;
+                flex-direction:column;
+                padding:20px;
+                display:none;
+                gap:16px;
+            }
+            nav ul.open {
+                display:flex;
+            }
+            .mobile-menu-btn {
+                display:block;
+            }
+            .about-wrap, .contact-grid {
+                grid-template-columns:1fr;
+            }
+            .hero-content h1 {
+                font-size:36px;
+            }
+            .video-wrap iframe {
+                height:280px;
+            }
+        }
+        /* 语言切换：互斥显示，不同时出现 */
+        [data-lang="zh"] { display:none; }
+        [data-lang="en"] { display:block; }
+        html.lang-zh [data-lang="zh"] { display:block !important; }
+        html.lang-zh [data-lang="en"] { display:none !important; }
+        html.lang-en [data-lang="zh"] { display:none !important; }
+        html.lang-en [data-lang="en"] { display:block !important; }
+    </style>
+</head>
+<body>
+    <!-- First Open Popup Modal -->
+    <div class="popup-modal" id="offerPopup">
+        <div class="popup-inner">
+            <button class="popup-close" id="closePopup"><i class="fas fa-times"></i></button>
+            <div class="popup-bg-img"></div>
+            <div class="popup-content">
+                <h3 data-lang="zh">🎉 限时优惠 & 营业时间</h3>
+                <h3 data-lang="en">🎉 Opening Hours & Special Offers</h3>
+                <p data-lang="zh">营业时间：每天 16:00‑23:00</p>
+                <p data-lang="en">Opening Hours: Daily 16:00‑23:00</p>
+                <div class="popup-offer-item">
+                    <span data-lang="zh">订单满 £18：免费虾片</span>
+                    <span data-lang="en">Order over £18: FREE Prawn Crackers</span>
+                </div>
+                <div class="popup-offer-item">
+                    <span data-lang="zh">订单满 £30：免费虾片 + 迷你蔬菜春卷</span>
+                    <span data-lang="en">Order over £30: FREE Prawn Crackers & Mini Vegetable Spring Rolls</span>
+                </div>
+                <div class="popup-offer-item">
+                    <span data-lang="zh">订单满 £45：免费虾片 & 椒盐鸡翅（不含配送费）</span>
+                    <span data-lang="en">Order over £45: FREE Prawn Crackers & Salt & Pepper Chicken Wings (exclude delivery charges)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">RG August</div>
+            <nav>
+                <ul id="navMenu">
+                    <li><a href="#hero" data-lang="zh">首页</a><a href="#hero" data-lang="en">Home</a></li>
+                    <li><a href="#about" data-lang="zh">餐厅介绍</a><a href="#about" data-lang="en">About Us</a></li>
+                    <li><a href="#menu" data-lang="zh">菜单</a><a href="#menu" data-lang="en">Menu</a></li>
+                    <li><a href="#signature" data-lang="zh">招牌菜</a><a href="#signature" data-lang="en">Signature</a></li>
+                    <li><a href="#video" data-lang="zh">宣传视频</a><a href="#video" data-lang="en">Video</a></li>
+                    <li><a href="#contact" data-lang="zh">联系我们</a><a href="#contact" data-lang="en">Contact</a></li>
+                    <li><a href="http://1858.merchant.onestepeat.co.uk/" class="btn-book" data-lang="zh">点餐</a><a href="http://1858.merchant.onestepeat.co.uk/" class="btn-book" data-lang="en">Order</a></li>
+                </ul>
+                <button class="lang-switch" id="langBtn">EN / 中文</button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h1>RG August</h1>
+            <p data-lang="zh">正宗爱丁堡中式外卖 | 地道中英风味</p>
+            <p data-lang="en">Authentic Chinese Takeaway in Edinburgh</p>
+            <a href="http://1858.merchant.onestepeat.co.uk/" target="_blank" class="btn-order" data-lang="zh">立即点餐</a>
+            <a href="http://1858.merchant.onestepeat.co.uk/" target="_blank" class="btn-order" data-lang="en">Order Now</a>
+        </div>
+    </section>
+
+    <!-- About Restaurant -->
+    <section id="about">
+        <h2 class="section-title" data-lang="zh">餐厅介绍</h2>
+        <h2 class="section-title" data-lang="en">About Us</h2>
+        <div class="about-wrap">
+            <div class="about-img">
+                <img src="https://images.pexels.com/photos/4252137/pexels-photo-4252137.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Chinese takeaway restaurant">
+            </div>
+            <div class="about-text">
+                <p data-lang="zh">RG August 坐落于爱丁堡Calder Park，是一家地道英国中餐外卖店。我们坚持选用新鲜食材，传承粤式、川式、泰式等多元中餐烹饪技艺。从浓汤靓汤、酸甜菜品、咖喱、芙蓉蛋，到宫保、四川风味、烧味与各类炒饭炒面，我们为本地食客带来丰富的中式美味。支持外卖配送与到店自取，欢迎电话或线上下单。</p>
+                <p data-lang="en">RG August is a local authentic Chinese takeaway located in Calder Park, Edinburgh. We use fresh ingredients and blend Cantonese, Szechuan and Thai‑inspired cooking styles. Our extensive menu includes soups, sweet‑sour dishes, curries, egg foo yung, kung po, szechuan roasts, fried rice and chow mein. We offer delivery and collection service. You are welcome to order online or by phone.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section 完整全部PDF菜品 -->
+    <section id="menu">
+        <h2 class="section-title" data-lang="zh">菜单</h2>
+        <h2 class="section-title" data-lang="en">Our Menu</h2>
+        <div class="menu-category-tabs">
+            <button class="tab-btn active" data-group="soups">Soups | 汤品</button>
+            <button class="tab-btn" data-group="eggfooyung">Egg Foo Yung | 芙蓉蛋</button>
+            <button class="tab-btn" data-group="curry">Curry | 咖喱菜品</button>
+            <button class="tab-btn" data-group="sweetandsour">Sweet & Sour | 酸甜菜品</button>
+            <button class="tab-btn" data-group="chicken">Chicken Dishes | 鸡肉菜品</button>
+            <button class="tab-btn" data-group="beef">Beef Dishes | 牛肉菜品</button>
+            <button class="tab-btn" data-group="charsiu">Char Siu | 叉烧菜品</button>
+            <button class="tab-btn" data-group="rice">Fried Rice | 炒饭</button>
+            <button class="tab-btn" data-group="chowmein">Chow Mein | 炒面</button>
+            <button class="tab-btn" data-group="happymeal">Happy Meal | 欢乐套餐</button>
+            <button class="tab-btn" data-group="sides">Sides & Omelette | 小食煎蛋</button>
+            <button class="tab-btn" data-group="drinks">Drinks | 饮品</button>
+        </div>
+
+        <!-- Soups -->
+        <div class="menu-group show" data-group="soups">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Crabmeat Sweetcorn Soup | 蟹肉玉米汤</div>
+                    <div class="menu-price">£3.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Chicken Sweetcorn Soup | 鸡肉玉米汤</div>
+                    <div class="menu-price">£3.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Sweetcorn Soup | 玉米汤</div>
+                    <div class="menu-price">£3.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Chicken Noodle Soup | 鸡肉面条汤</div>
+                    <div class="menu-price">£3.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Chicken Mushroom Soup | 鸡肉蘑菇汤</div>
+                    <div class="menu-price">£3.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Peking Hot & Sour Soup | 北京酸辣汤</div>
+                    <div class="menu-price">£3.80</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Won Ton Soup | 云吞汤</div>
+                    <div class="menu-price">£4.20</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Egg Foo Yung -->
+        <div class="menu-group" data-group="eggfooyung">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Special Foo Yung | 特色芙蓉蛋</div>
+                    <div class="menu-price">£7.00</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">King Prawn Foo Yung | 大虾芙蓉蛋</div>
+                    <div class="menu-price">£7.20</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Shrimp Foo Yung | 小虾芙蓉蛋</div>
+                    <div class="menu-price">£6.80</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Chicken Foo Yung | 鸡肉芙蓉蛋</div>
+                    <div class="menu-price">£6.70</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Char Siu Foo Yung | 叉烧芙蓉蛋</div>
+                    <div class="menu-price">£6.70</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Ham Foo Yung | 火腿芙蓉蛋</div>
+                    <div class="menu-price">£6.70</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Mushroom Foo Yung | 蘑菇芙蓉蛋</div>
+                    <div class="menu-price">£6.30</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Vegetable Foo Yung | 蔬菜芙蓉蛋</div>
+                    <div class="menu-price">£6.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Curry -->
+        <div class="menu-group" data-group="curry">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Thai Red Curry Char Siu | 泰式红咖喱叉烧</div>
+                    <div class="menu-price">£6.70</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Beef Curry | 牛肉咖喱</div>
+                    <div class="menu-price">£6.90</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Chicken Curry | 鸡肉咖喱</div>
+                    <div class="menu-price">£6.70</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Prawn Curry | 大虾咖喱</div>
+                    <div class="menu-price">£7.20</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sweet & Sour -->
+        <div class="menu-group" data-group="sweetandsour">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Deep Fried Shredded Beef in Sweet Chilli Sauce | 甜辣酱炸牛肉丝</div>
+                    <div class="menu-price">£7.20</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chicken -->
+        <div class="menu-group" data-group="chicken">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Kung Po Chicken | 宫保鸡肉</div>
+                    <div class="menu-price">£5.50</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Beef -->
+        <div class="menu-group" data-group="beef">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Szechuan Beef | 四川牛肉</div>
+                    <div class="menu-price">£7.50</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Char Siu -->
+        <div class="menu-group" data-group="charsiu">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Char Siu Special | 特色叉烧</div>
+                    <div class="menu-price">£6.70</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fried Rice -->
+        <div class="menu-group" data-group="rice">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Special Fried Rice | 特色炒饭</div>
+                    <div class="menu-price">£5.70</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Chicken Fried Rice | 鸡肉炒饭</div>
+                    <div class="menu-price">£5.60</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Char Siu Fried Rice | 叉烧炒饭</div>
+                    <div class="menu-price">£5.70</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Vegetable Fried Rice | 蔬菜炒饭</div>
+                    <div class="menu-price">£5.50</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chow Mein -->
+        <div class="menu-group" data-group="chowmein">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Special Chow Mein | 特色炒面</div>
+                    <div class="menu-price">£7.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Chicken Chow Mein | 鸡肉炒面</div>
+                    <div class="menu-price">£7.20</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Beef Chow Mein | 牛肉炒面</div>
+                    <div class="menu-price">£7.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Vegetable Chow Mein | 蔬菜炒面</div>
+                    <div class="menu-price">£5.50</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Happy Meal -->
+        <div class="menu-group" data-group="happymeal">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">2 Course Happy Meal A | 两道欢乐套餐A</div>
+                    <div class="menu-price">£11.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">2 Course Happy Meal B | 两道欢乐套餐B</div>
+                    <div class="menu-price">£11.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">3 Course Happy Meal A | 三道欢乐套餐A</div>
+                    <div class="menu-price">£12.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">3 Course Happy Meal B | 三道欢乐套餐B</div>
+                    <div class="menu-price">£12.50</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sides & Omelette -->
+        <div class="menu-group" data-group="sides">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Omelette with Chips | 煎蛋配薯条</div>
+                    <div class="menu-price">£4.00</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Chips with Sauce | 薯条配酱汁</div>
+                    <div class="menu-price">£4.30</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Extra Pancake | 额外薄饼</div>
+                    <div class="menu-price">£1.50</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drinks -->
+        <div class="menu-group" data-group="drinks">
+            <div class="menu-items-container">
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Canned Drinks | 罐装饮料</div>
+                    <div class="menu-price">£1.50</div>
+                </div>
+                <div class="menu-item-card">
+                    <div class="menu-item-name">Bottled Drinks (2L) | 瓶装饮料2升</div>
+                    <div class="menu-price">£3.30</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signature Dishes -->
+    <section id="signature">
+        <h2 class="section-title" data-lang="zh">招牌菜品</h2>
+        <h2 class="section-title" data-lang="en">Signature Dishes</h2>
+        <div class="signature-grid">
+            <div class="sig-card">
+                <img class="sig-img" src="https://images.pexels.com/photos/2313682/pexels-photo-2313682.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Egg Foo Yung">
+                <div class="sig-info">
+                    <div class="sig-name">King Prawn Foo Yung<br>大虾芙蓉蛋</div>
+                    <div class="sig-price">£7.20</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="https://images.pexels.com/photos/674574/pexels-photo-674574.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Hot & Sour Soup">
+                <div class="sig-info">
+                    <div class="sig-name">Peking Hot & Sour Soup<br>北京酸辣汤</div>
+                    <div class="sig-price">£3.80</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Thai Red Curry">
+                <div class="sig-info">
+                    <div class="sig-name">Thai Red Curry Char Siu<br>泰式红咖喱叉烧</div>
+                    <div class="sig-price">£6.70</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="https://images.pexels.com/photos/1833382/pexels-photo-1833382.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Special Fried Rice">
+                <div class="sig-info">
+                    <div class="sig-name">Special Fried Rice<br>特色炒饭</div>
+                    <div class="sig-price">£5.70</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="https://images.pexels.com/photos/2116092/pexels-photo-2116092.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Special Chow Mein">
+                <div class="sig-info">
+                    <div class="sig-name">Special Chow Mein<br>特色炒面</div>
+                    <div class="sig-price">£7.50</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Won Ton Soup">
+                <div class="sig-info">
+                    <div class="sig-name">Won Ton Soup<br>云吞汤</div>
+                    <div class="sig-price">£4.20</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section id="video">
+        <h2 class="section-title" data-lang="zh">宣传视频</h2>
+        <h2 class="section-title" data-lang="en">Promo Video</h2>
+        <div class="video-wrap">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- Contact Us -->
+    <section id="contact">
+        <h2 class="section-title" data-lang="zh">联系我们</h2>
+        <h2 class="section-title" data-lang="en">Contact Us</h2>
+        <div class="contact-grid">
+            <div class="contact-block">
+                <h4 data-lang="zh">餐厅信息</h4>
+                <h4 data-lang="en">Restaurant Info</h4>
+                <p>
+                    <i class="fas fa-map-marker-alt" style="color:#d4af37"></i>
+                    14 CALDER PARK, EDINBURGH, EH11 4JN<br>
+                    <a href="https://www.google.com/maps/search/?api=1&query=14+CALDER+PARK%2CEDINBURGH%2CEH11+4JN" target="_blank" data-lang="zh">点击打开谷歌地图导航</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=14+CALDER+PARK%2CEDINBURGH%2CEH11+4JN" target="_blank" data-lang="en">Open Google Maps Navigation</a>
+                </p>
+                <p><i class="fas fa-phone" style="color:#d4af37"></i> 0131 2487211 / 07858757528</p>
+                <p><i class="fas fa-envelope" style="color:#d4af37"></i> info@rgaugust.co.uk</p>
+                <p><i class="fas fa-clock" style="color:#d4af37"></i> <span data-lang="zh">营业时间：每日16:00‑23:00</span><span data-lang="en">Opening Hours: Daily 16:00‑23:00</span></p>
+            </div>
+            <div class="contact-block">
+                <iframe class="map-embed" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2701.123456789!2d-3.256789!3d55.934567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTXCsDU2JzQ0LjQiTiAzwrJkMTUnMjUuMyJX!5e0!3m2!1sen!2suk!4v1720000000000!5m2!1sen!2suk" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 RG August Chinese Kitchen | <span data-lang="zh">爱丁堡中餐外卖</span><span data-lang="en">Edinburgh Chinese Takeaway</span></p>
+    </footer>
+
+    <script>
+        // Popup logic - show once on first load
+        const popup = document.getElementById('offerPopup');
+        const closePopupBtn = document.getElementById('closePopup');
+        if(!sessionStorage.getItem('popupClosed')){
+            setTimeout(()=>{
+                popup.classList.add('show');
+            }, 600);
+        }
+        closePopupBtn.addEventListener('click', ()=>{
+            popup.classList.remove('show');
+            sessionStorage.setItem('popupClosed','yes');
+        });
+        popup.addEventListener('click',(e)=>{
+            if(e.target === popup){
+                popup.classList.remove('show');
+                sessionStorage.setItem('popupClosed','yes');
+            }
+        });
+
+        // Mobile Menu
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+        mobileBtn.addEventListener('click',()=>{
+            navMenu.classList.toggle('open');
+        });
+
+        // Language Switch 互斥显示，不同时渲染
+        const langBtn = document.getElementById('langBtn');
+        const htmlEl = document.documentElement;
+        let currentLang = 'en';
+        langBtn.addEventListener('click',()=>{
+            if(currentLang === 'en'){
+                htmlEl.classList.add('lang-zh');
+                htmlEl.classList.remove('lang-en');
+                currentLang = 'zh';
+                langBtn.innerText = '中文 / EN';
+            }else{
+                htmlEl.classList.add('lang-en');
+                htmlEl.classList.remove('lang-zh');
+                currentLang = 'en';
+                langBtn.innerText = 'EN / 中文';
+            }
+        });
+
+        // Menu Tab Switch
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const menuGroups = document.querySelectorAll('.menu-group');
+        tabButtons.forEach(btn=>{
+            btn.addEventListener('click',()=>{
+                const targetGroup = btn.dataset.group;
+                tabButtons.forEach(b=>b.classList.remove('active'));
+                btn.classList.add('active');
+                menuGroups.forEach(g=>{
+                    if(g.dataset.group === targetGroup){
+                        g.classList.add('show');
+                    }else{
+                        g.classList.remove('show');
+                    }
+                })
+            })
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor=>{
+            anchor.addEventListener('click',function(e){
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                const targetEl = document.querySelector(targetId);
+                if(targetEl){
+                    window.scrollTo({
+                        top: targetEl.offsetTop -72,
+                        behavior:'smooth'
+                    });
+                    navMenu.classList.remove('open');
+                }
+            })
+        })
+    </script>
+</body>
+</html>

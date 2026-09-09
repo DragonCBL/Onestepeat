@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RG August · Edinburgh Chinese Takeaway</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --black: #0a0a0a;
+            --dark-gray: #1a1a1a;
+            --gold: #d4af37;
+            --gold-light: #f0d78c;
+            --white: #ffffff;
+            --text-gray: #cccccc;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+        /* Popup Modal 修复手机适配 */
+        .popup-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.4s;
+            padding:16px;
+        }
+        .popup-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .popup-inner {
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y:auto;
+            background: var(--dark-gray);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            position: relative;
+        }
+        .popup-bg-img {
+            width: 100%;
+            height: 180px;
+            background: url('https://images.pexels.com/photos/2313682/pexels-photo-2313682.jpeg?auto=compress&cs=tinysrgb&w=800') center/cover no-repeat;
+        }
+        .popup-close {
+            position: absolute;
+            top:12px;
+            right:12px;
+            width:36px;
+            height:36px;
+            border-radius:50%;
+            background:var(--gold);
+            color:#000;
+            border:none;
+            font-size:20px;
+            cursor:pointer;
+            z-index:2;
+        }
+        .popup-content {
+            padding:20px;
+        }
+        .popup-content h3 {
+            color:var(--gold);
+            margin-bottom:16px;
+            font-size:20px;
+        }
+        .popup-content p {
+            color:var(--text-gray);
+            margin:8px 0;
+            line-height:1.6;
+        }
+        .popup-offer-item {
+            padding:10px 0;
+            border-bottom:1px solid #333;
+            color:var(--gold-light);
+        }
+        /* Header Nav 融合logo + 口号 */
+        header {
+            position:fixed;
+            width:100%;
+            top:0;
+            z-index:998;
+            background:rgba(10,10,10,0.92);
+            border-bottom:1px solid #222;
+        }
+        .nav-container {
+            max-width:1400px;
+            margin:0 auto;
+            padding:0 20px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            height:72px;
+            gap:10px;
+        }
+        .logo-wrapper {
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+        .logo-img {
+            height:40px;
+            width:auto;
+            border-radius:4px;
+        }
+        .brand-group {
+            display:flex;
+            flex-direction:column;
+            line-height:1.2;
+        }
+        .logo-text {
+            font-size:22px;
+            font-weight:bold;
+            color:var(--gold);
+            letter-spacing:0.5px;
+        }
+        .tagline {
+            font-size:11px;
+            color:var(--gold-light);
+            letter-spacing:0.3px;
+            opacity:0.8;
+            font-style:italic;
+            margin-top:1px;
+        }
+        nav {
+            display:flex;
+            align-items:center;
+        }
+        nav ul {
+            display:flex;
+            gap:26px;
+            list-style:none;
+            align-items:center;
+        }
+        nav a {
+            color:var(--text-gray);
+            text-decoration:none;
+            transition:0.3s;
+            display:block;
+        }
+        nav a:hover {
+            color:var(--gold);
+        }
+        .btn-book {
+            background:var(--gold);
+            color:#000 !important;
+            padding:8px 18px;
+            border-radius:6px;
+            font-weight:bold;
+        }
+        /* 移除语言切换按钮 – 不再使用 */
+        .lang-switch {
+            display:none !important;
+        }
+        .mobile-menu-btn {
+            display:none;
+            color:var(--gold);
+            font-size:24px;
+            background:none;
+            border:none;
+        }
+        /* Hero Section */
+        .hero {
+            height:100vh;
+            background:url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            position:relative;
+        }
+        .hero::before {
+            content:"";
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,0.65);
+        }
+        .hero-content {
+            position:relative;
+            text-align:center;
+            z-index:2;
+        }
+        .hero-content h1 {
+            font-size:56px;
+            color:var(--gold);
+            margin-bottom:20px;
+        }
+        .hero-content p {
+            font-size:20px;
+            color:var(--text-gray);
+            margin-bottom:32px;
+        }
+        .btn-order {
+            display:inline-block;
+            background:var(--gold);
+            color:#000;
+            font-weight:bold;
+            padding:14px 36px;
+            border-radius:8px;
+            text-decoration:none;
+            font-size:18px;
+            transition:0.3s;
+        }
+        .btn-order:hover {
+            background:var(--gold-light);
+        }
+        section {
+            padding:80px 20px;
+            max-width:1400px;
+            margin:0 auto;
+        }
+        .section-title {
+            text-align:center;
+            font-size:36px;
+            color:var(--gold);
+            margin-bottom:48px;
+        }
+        /* About Restaurant – 全新品牌故事 */
+        .about-wrap {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:40px;
+            align-items:center;
+        }
+        .about-img img {
+            width:100%;
+            border-radius:10px;
+            border:2px solid var(--gold);
+        }
+        .about-text p {
+            color:var(--text-gray);
+            line-height:1.8;
+            margin-bottom:16px;
+        }
+        .about-text strong {
+            color:var(--gold-light);
+        }
+        /* Menu 已移除整个板块，隐藏 */
+        #menu {
+            display:none !important;
+        }
+        /* Signature Dishes */
+        .signature-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+            gap:24px;
+        }
+        .sig-card {
+            background:var(--dark-gray);
+            border-radius:10px;
+            overflow:hidden;
+            border:1px solid #333;
+        }
+        .sig-img {
+            height:200px;
+            width:100%;
+            object-fit:cover;
+        }
+        .sig-info {
+            padding:16px;
+            text-align:center;
+        }
+        .sig-name {
+            color:var(--gold-light);
+            font-size:18px;
+            margin-bottom:6px;
+        }
+        .sig-price {
+            color:var(--gold);
+            font-weight:bold;
+        }
+        /* Video Section */
+        .video-wrap {
+            max-width:900px;
+            margin:0 auto;
+        }
+        .video-wrap iframe {
+            width:100%;
+            height:480px;
+            border:2px solid var(--gold);
+            border-radius:10px;
+        }
+        /* Contact Section – 邮箱 → Facebook */
+        .contact-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:40px;
+        }
+        .contact-block h4 {
+            color:var(--gold);
+            margin-bottom:14px;
+            font-size:20px;
+        }
+        .contact-block p, .contact-block a {
+            color:var(--text-gray);
+            line-height:1.8;
+            text-decoration:none;
+        }
+        .contact-block a:hover {
+            color:var(--gold);
+        }
+        .map-embed {
+            width:100%;
+            height:320px;
+            border:2px solid var(--gold);
+            border-radius:10px;
+        }
+        footer {
+            background:#111;
+            padding:30px 20px;
+            text-align:center;
+            border-top:1px solid #222;
+            color:#888;
+        }
+        /* Mobile */
+        @media(max-width:900px) {
+            nav ul {
+                position:absolute;
+                top:72px;
+                left:0;
+                width:100%;
+                background:#0a0a0a;
+                flex-direction:column;
+                padding:20px;
+                display:none;
+                gap:16px;
+            }
+            nav ul.open {
+                display:flex;
+            }
+            .mobile-menu-btn {
+                display:block;
+            }
+            .about-wrap, .contact-grid {
+                grid-template-columns:1fr;
+            }
+            .hero-content h1 {
+                font-size:36px;
+            }
+            .video-wrap iframe {
+                height:280px;
+            }
+            .logo-img {
+                height:32px;
+            }
+            .logo-text {
+                font-size:18px;
+            }
+            .tagline {
+                font-size:10px;
+            }
+        }
+        /* 完全移除语言切换影响 */
+        [data-lang] { display:block !important; }
+        .lang-switch { display:none !important; }
+    </style>
+</head>
+<body>
+    <!-- First Open Popup Modal (保持不变，全英文) -->
+    <div class="popup-modal" id="offerPopup">
+        <div class="popup-inner">
+            <button class="popup-close" id="closePopup"><i class="fas fa-times"></i></button>
+            <div class="popup-bg-img"></div>
+            <div class="popup-content">
+                <h3>🎉 Opening Hours & Special Offers</h3>
+                <p>Opening Hours: Daily 16:00‑23:00</p>
+                <div class="popup-offer-item">Order over £18: FREE Prawn Crackers</div>
+                <div class="popup-offer-item">Order over £30: FREE Prawn Crackers & Mini Vegetable Spring Rolls</div>
+                <div class="popup-offer-item">Order over £45: FREE Prawn Crackers & Salt & Pepper Chicken Wings (exclude delivery charges)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation – 左上logo+店名+口号，无语言切换 -->
+    <header>
+        <div class="nav-container">
+            <div class="logo-wrapper">
+                <!-- logo.jpg 嵌入 (base64内嵌，保持独立) -->
+                <img src="Logo.jpg">
+                <div class="brand-group">
+                    <span class="logo-text">RG August</span>
+                    <span class="tagline">A Family Story, Served One Dish at a Time.</span>
+                </div>
+            </div>
+            <nav>
+                <ul id="navMenu">
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#signature">Signature</a></li>
+                    <li><a href="#video">Video</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="http://1858.merchant.onestepeat.co.uk/" class="btn-book">Order</a></li>
+                </ul>
+                <!-- 语言切换按钮已移除 -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h1>RG August</h1>
+            <p>Authentic Chinese Takeaway in Edinburgh</p>
+            <a href="http://1858.merchant.onestepeat.co.uk/" target="_blank" class="btn-order">Order Now</a>
+        </div>
+    </section>
+
+    <!-- About Restaurant – 全新品牌故事，全英文 -->
+    <section id="about">
+        <h2 class="section-title">About Us</h2>
+        <div class="about-wrap">
+            <div class="about-img">
+                <img src="https://images.pexels.com/photos/4252137/pexels-photo-4252137.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Chinese takeaway restaurant">
+            </div>
+            <div class="about-text">
+                <p><strong>At RG August, every detail tells a story.</strong></p>
+                <p>The name RG comes from the initials of our two children, Rita and Gilbert. They are the inspiration behind everything we do and remind us why this journey began.</p>
+                <p>August holds a special place in our hearts. Both of our children were born in August, and as the eighth month of the year, August also connects naturally with the number 8. In Chinese culture, the number 8 is a symbol of prosperity, good fortune and new beginnings. For us, it represents not only luck, but also family, hope and the dream of building something meaningful together.</p>
+                <p>RG August is more than a Chinese takeaway. It is a family business built on love, tradition and a passion for sharing authentic Chinese flavours with our local community.</p>
+                <p>Every meal we prepare is made with the same care and pride as if we were cooking for our own family. We hope that whenever you visit RG August, you will enjoy not only delicious food, but also the warmth, happiness and good fortune that inspired our name.</p>
+                <p><strong>Welcome to the RG August family.</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu 板块已完全移除 (ID隐藏) -->
+
+    <!-- Signature Dishes (保留) -->
+    <section id="signature">
+        <h2 class="section-title">Signature Dishes</h2>
+        <div class="signature-grid">
+            <div class="sig-card">
+                <img class="sig-img" src="image/King Prawn Foo Yung.png" alt="King Prawn Foo Yung">
+                <div class="sig-info">
+                    <div class="sig-name">King Prawn Foo Yung</div>
+                    <div class="sig-price">£7.20</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="image/Peking Hot & Sour Soup.png" alt="Peking Hot & Sour Soup">
+                <div class="sig-info">
+                    <div class="sig-name">Peking Hot & Sour Soup</div>
+                    <div class="sig-price">£3.80</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="image/Thai Red Curry Char Siu.png" alt="Thai Red Curry Char Siu">
+                <div class="sig-info">
+                    <div class="sig-name">Thai Red Curry Char Siu</div>
+                    <div class="sig-price">£6.70</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="image/Special Fried Rice.png" alt="Special Fried Rice">
+                <div class="sig-info">
+                    <div class="sig-name">Special Fried Rice</div>
+                    <div class="sig-price">£5.70</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="image/Special Chow Mein.png" alt="Special Chow Mein">
+                <div class="sig-info">
+                    <div class="sig-name">Special Chow Mein</div>
+                    <div class="sig-price">£7.50</div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <img class="sig-img" src="image/Won Ton Soup.png" alt="Won Ton Soup">
+                <div class="sig-info">
+                    <div class="sig-name">Won Ton Soup</div>
+                    <div class="sig-price">£4.20</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section id="video">
+        <h2 class="section-title">Promo Video</h2>
+        <div class="video-wrap">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- Contact Us – 邮箱替换为 Facebook -->
+    <section id="contact">
+        <h2 class="section-title">Contact Us</h2>
+        <div class="contact-grid">
+            <div class="contact-block">
+                <h4>Restaurant Info</h4>
+                <p>
+                    <i class="fas fa-map-marker-alt" style="color:#d4af37"></i>
+                    14 CALDER PARK, EDINBURGH, EH11 4JN<br>
+                    <a href="https://www.google.com/maps/search/?api=1&query=14+CALDER+PARK%2CEDINBURGH%2CEH11+4JN" target="_blank">Open Google Maps Navigation</a>
+                </p>
+                <p><i class="fas fa-phone" style="color:#d4af37"></i> 0131 2487211 / 07858757528</p>
+                <!-- 邮箱替换为 Facebook 图标 + 链接 -->
+                <p>
+                    <i class="fab fa-facebook" style="color:#d4af37; font-size:1.2rem;"></i> 
+                    <a href="https://www.facebook.com/RGAugust" target="_blank">facebook.com/RGAugust</a>
+                </p>
+                <p><i class="fas fa-clock" style="color:#d4af37"></i> Opening Hours: Daily 16:00‑23:00</p>
+            </div>
+            <div class="contact-block">
+                <iframe class="map-embed" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2701.123456789!2d-3.256789!3d55.934567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTXCsDU2JzQ0LjQiTiAzwrJkMTUnMjUuMyJX!5e0!3m2!1sen!2suk!4v1720000000000!5m2!1sen!2suk" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 RG August Chinese Kitchen · Edinburgh Chinese Takeaway</p>
+    </footer>
+
+    <script>
+        // Popup logic – show once
+        const popup = document.getElementById('offerPopup');
+        const closePopupBtn = document.getElementById('closePopup');
+        if(!sessionStorage.getItem('popupClosed')){
+            setTimeout(()=>{
+                popup.classList.add('show');
+            }, 600);
+        }
+        closePopupBtn.addEventListener('click', ()=>{
+            popup.classList.remove('show');
+            sessionStorage.setItem('popupClosed','yes');
+        });
+        popup.addEventListener('click',(e)=>{
+            if(e.target === popup){
+                popup.classList.remove('show');
+                sessionStorage.setItem('popupClosed','yes');
+            }
+        });
+
+        // Mobile Menu
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+        mobileBtn.addEventListener('click',()=>{
+            navMenu.classList.toggle('open');
+        });
+
+        // 语言切换已移除，无任何相关代码
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor=>{
+            anchor.addEventListener('click',function(e){
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                const targetEl = document.querySelector(targetId);
+                if(targetEl){
+                    window.scrollTo({
+                        top: targetEl.offsetTop -72,
+                        behavior:'smooth'
+                    });
+                    navMenu.classList.remove('open');
+                }
+            })
+        })
+    </script>
+</body>
+</html>
